@@ -138,3 +138,5 @@ GitHub.sublime-settings
 
 #prettier
 .prettierrc
+
+*/node_modules/
