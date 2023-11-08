@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Grid, Button, Typography } from "@material-ui/core";
 import CreateRoomPage from "./CreateRoomPage";
 import MusicPlayer from "./MusicPlayer";
+import WebPlayback from "./WebPlayback";
 
 const Room = ({ leaveRoomCallback }) => {
   const { roomCode } = useParams();
@@ -11,6 +12,7 @@ const Room = ({ leaveRoomCallback }) => {
   const [isHost, setIsHost] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [spotifyAuthenticated, setSpotifyAuthenticated] = useState(false);
+  const [token, setToken] = useState(null);
   const [song, setSong] = useState({});
   const navigate = useNavigate();
 
@@ -38,6 +40,7 @@ const Room = ({ leaveRoomCallback }) => {
         setIsHost(data.is_host);
         if (data.is_host) {
           authenticateSpotify();
+          getAccessToken();
         }
         console.log(isHost, data.is_host);
       });
@@ -66,6 +69,14 @@ const Room = ({ leaveRoomCallback }) => {
       .catch((error) => {
         console.error("Error during fetch:", error);
       });
+  };
+
+  const getAccessToken = async () => {
+    const response = await fetch("/spotify/get-token");
+    const data = await response.json();
+    if (data.access_token) {
+      setToken(data.access_token);
+    }
   };
 
   const getCurrentSong = () => {
@@ -151,6 +162,7 @@ const Room = ({ leaveRoomCallback }) => {
         </Typography>
       </Grid>
       <MusicPlayer {...song} />
+      {token && <WebPlayback token={token} />}
       {isHost ? renderSettingsButton() : null}
       <Grid item xs={12} align="center">
         <Button
