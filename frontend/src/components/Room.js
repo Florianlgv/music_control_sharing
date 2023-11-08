@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Grid, Button, Typography } from "@material-ui/core";
 import CreateRoomPage from "./CreateRoomPage";
+import MusicPlayer from "./MusicPlayer";
 
 const Room = ({ leaveRoomCallback }) => {
   const { roomCode } = useParams();
@@ -15,7 +16,11 @@ const Room = ({ leaveRoomCallback }) => {
 
   useEffect(() => {
     getRoomDetails();
-    getCurrentSong();
+    const interval = setInterval(getCurrentSong, 1000);
+
+    return () => {
+      clearInterval(interval);
+    };
   }, [roomCode]);
 
   const getRoomDetails = () => {
@@ -66,7 +71,6 @@ const Room = ({ leaveRoomCallback }) => {
   const getCurrentSong = () => {
     fetch("/spotify/current-song")
       .then((response) => {
-        console.log(response);
         if (!response.ok) {
           return {};
         } else {
@@ -74,8 +78,8 @@ const Room = ({ leaveRoomCallback }) => {
         }
       })
       .then((data) => {
-        setSong(data);
         console.log(data);
+        setSong(data);
       });
   };
 
@@ -146,21 +150,7 @@ const Room = ({ leaveRoomCallback }) => {
           Room Code: {roomCode}
         </Typography>
       </Grid>
-      <Grid item xs={12} align="center">
-        <Typography variant="h6" component="h6">
-          Votes: {votesToSkip}
-        </Typography>
-      </Grid>
-      <Grid item xs={12} align="center">
-        <Typography variant="h6" component="h6">
-          guestCanPause: {guestCanPause.toString()}
-        </Typography>
-      </Grid>
-      <Grid item xs={12} align="center">
-        <Typography variant="h6" component="h6">
-          isHost: {isHost.toString()}
-        </Typography>
-      </Grid>
+      <MusicPlayer {...song} />
       {isHost ? renderSettingsButton() : null}
       <Grid item xs={12} align="center">
         <Button
