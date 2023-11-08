@@ -10,8 +10,8 @@ from django.http import JsonResponse
 
 
 class AuthURL(APIView):
-    def get(self, request, fornat=None):
-        scopes = "user-read-playback-state user-modify-playback-state user-read-currently-playing"
+    def get(self, request, format=None):
+        scopes = "user-read-playback-state user-modify-playback-state user-read-currently-playing streaming"
 
         url = (
             Request(
@@ -138,3 +138,18 @@ class PlaySong(APIView):
             return Response({}, status=status.HTTP_204_NO_CONTENT)
 
         return Response({}, status=status.HTTP_403_FORBIDDEN)
+
+
+class GetToken(APIView):
+    def get(self, response, format=None):
+        room_code = self.request.session.get("room_code")
+        room = Room.objects.filter(code=room_code)
+        if room.exists():
+            room = room[0]
+        else:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+        host = room.host
+        tokens = get_user_tokens(host)
+        return Response(
+            {"access_token": tokens.access_token}, status=status.HTTP_200_OK
+        )
