@@ -9,10 +9,13 @@ const Room = ({ leaveRoomCallback }) => {
   const [guestCanPause, setGuestCanPause] = useState(false);
   const [isHost, setIsHost] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [spotifyAuthenticated, setSpotifyAuthenticated] = useState(false);
+  const [song, setSong] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
     getRoomDetails();
+    getCurrentSong();
   }, [roomCode]);
 
   const getRoomDetails = () => {
@@ -28,6 +31,51 @@ const Room = ({ leaveRoomCallback }) => {
         setVotesToSkip(data.votes_to_skip);
         setGuestCanPause(data.guest_can_pause);
         setIsHost(data.is_host);
+        if (data.is_host) {
+          authenticateSpotify();
+        }
+        console.log(isHost, data.is_host);
+      });
+  };
+
+  const authenticateSpotify = () => {
+    fetch("/spotify/is-authenticated")
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error("Network response was not ok.");
+      })
+      .then((data) => {
+        setSpotifyAuthenticated(data.status);
+        if (!data.status) {
+          fetch("/spotify/get-auth-url")
+            .then((response) => {
+              return response.json();
+            })
+            .then((data) => {
+              window.location.replace(data.url);
+            });
+        }
+      })
+      .catch((error) => {
+        console.error("Error during fetch:", error);
+      });
+  };
+
+  const getCurrentSong = () => {
+    fetch("/spotify/current-song")
+      .then((response) => {
+        console.log(response);
+        if (!response.ok) {
+          return {};
+        } else {
+          return response.json();
+        }
+      })
+      .then((data) => {
+        setSong(data);
+        console.log(data);
       });
   };
 
