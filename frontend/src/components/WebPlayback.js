@@ -1,4 +1,20 @@
 import React, { useState, useEffect } from "react";
+import {
+  Grid,
+  Typography,
+  Button,
+  Card,
+  IconButton,
+  LinearProgress,
+  CardContent,
+  CardMedia,
+  Box,
+  useTheme,
+} from "@mui/material";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import PauseIcon from "@mui/icons-material/Pause";
+import SkipNextIcon from "@mui/icons-material/SkipNext";
+import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
 
 const track = {
   name: "",
@@ -13,6 +29,8 @@ function WebPlayback(props) {
   const [is_paused, setPaused] = useState(false);
   const [is_active, setActive] = useState(false);
   const [current_track, setTrack] = useState(track);
+  const [is_connected, setConnected] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     const script = document.createElement("script");
@@ -34,23 +52,117 @@ function WebPlayback(props) {
 
       player.addListener("ready", ({ device_id }) => {
         console.log("Ready with Device ID", device_id);
+        setConnected(true);
       });
 
       player.addListener("not_ready", ({ device_id }) => {
         console.log("Device ID has gone offline", device_id);
+        setConnected(false);
       });
 
-      player.connect();
-    };
-  }, []);
+      player.addListener("player_state_changed", (state) => {
+        if (!state) {
+          return;
+        }
 
-  return (
-    <>
-      <div className="container">
-        <div className="main-wrapper">HELLO</div>
-      </div>
-    </>
+        setTrack(state.track_window.current_track);
+        setPaused(state.paused);
+
+        player.getCurrentState().then((state) => {
+          !state ? setActive(false) : setActive(true);
+        });
+      });
+      player.connect();
+
+      const interval = setInterval(() => {
+        player.getCurrentState().then((state) => {
+          if (!state) return;
+          const { position, duration } = state;
+          const progress = (position / duration) * 100;
+          setProgress(progress);
+        });
+      }, 1000);
+      return () => {
+        clearInterval(interval);
+        player.disconnect();
+      };
+    };
+  }, [props.token]);
+  const deviceNotConnected = (
+    <Card sx={{ bgcolor: "rgb(18, 18, 18)" }}>
+      <Grid item xs={4} align="center" sx={{ py: 3 }}>
+        <Typography color="#81b71a" component="h3" variant="h3">
+          Open Spotify App And Select The Device "Web Player SDK"
+        </Typography>
+      </Grid>
+    </Card>
   );
+  const spotifyPlayer = (
+    <Card sx={{ bgcolor: "rgb(18, 18, 18)", p: 2 }}>
+      <Grid container spacing={2} alignItems="center" justifyContent="center">
+        <Grid item xs={12} sm={12} md={4} align="center">
+          <img
+            src={current_track.album.images[0].url}
+            className="now-playing__cover"
+            height="100%"
+            width="100%"
+            alt={current_track.name}
+          />
+        </Grid>
+        <Grid item xs={12} sm={12} md={4} align="center">
+          <Card variant="outlined" sx={{ bgcolor: "rgb(40, 40, 40)", py: 3 }}>
+            <Typography component="h4" variant="h4">
+              {current_track.name}
+            </Typography>
+            <Typography style={{ color: "#fff" }} variant="subtitle1">
+              {current_track.artists[0].name}
+            </Typography>
+            <LinearProgress
+              variant="determinate"
+              value={progress}
+              sx={{ m: 2 }}
+            />
+            <Box sx={{ mt: 2, color: "#fff" }}>
+              <IconButton
+                style={{ color: "#fff" }}
+                onClick={() => {
+                  player.previousTrack();
+                }}
+              >
+                <SkipPreviousIcon fontSize="medium" />
+              </IconButton>
+              <IconButton
+                fontSize="large"
+                style={{ color: "#fff" }}
+                onClick={() => {
+                  player.togglePlay();
+                }}
+              >
+                {is_paused ? <PlayArrowIcon /> : <PauseIcon />}
+              </IconButton>
+              <IconButton
+                fontSize="large"
+                style={{ color: "#fff" }}
+                onClick={() => {
+                  player.nextTrack();
+                }}
+              >
+                <SkipNextIcon />
+              </IconButton>
+            </Box>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={12} md={4}>
+          <Card variant="outlined" sx={{ bgcolor: "rgb(40, 40, 40)", py: 4 }}>
+            <Typography component="h5" variant="h5">
+              Want to skip "Counter"
+            </Typography>
+          </Card>
+        </Grid>
+      </Grid>
+    </Card>
+  );
+  return <>{is_active ? spotifyPlayer : deviceNotConnected}</>;
 }
 
 export default WebPlayback;
