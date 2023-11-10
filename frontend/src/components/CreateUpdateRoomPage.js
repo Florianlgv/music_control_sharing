@@ -11,8 +11,8 @@ import {
   RadioGroup,
   FormControlLabel,
   Collapse,
-} from "@material-ui/core";
-import { Alert } from "@material-ui/lab";
+  Alert,
+} from "@mui/material";
 
 const CreateRoomPage = (props) => {
   const [votesToSkip, setVotesToSkip] = useState(props.votesToSkip);
@@ -65,7 +65,7 @@ const CreateRoomPage = (props) => {
 
   const renderCreateButtons = () => {
     return (
-      <Grid container>
+      <Grid container spacing={2}>
         <Grid item xs={12} align="center">
           <Button
             color="primary"
@@ -131,8 +131,8 @@ const CreateRoomPage = (props) => {
       </Grid>
       <Grid item xs={12} align="center">
         <FormControl component="fieldset">
-          <FormHelperText>
-            <div align="center">Guest Control of Playback State</div>
+          <FormHelperText align="center">
+            Guest Control of Playback State
           </FormHelperText>
           <RadioGroup
             row
@@ -154,17 +154,20 @@ const CreateRoomPage = (props) => {
           </RadioGroup>
         </FormControl>
       </Grid>
-      <Grid item xs={12} align="center">
+      <Grid item xs={12} sx={{ py: 1 }} align="center">
         <FormControl>
           <TextField
             required={true}
             type="number"
             onChange={handleVotesChange}
             defaultValue={votesToSkip}
-            inputProps={{ min: 1, style: { textAlign: "center" } }}
+            inputProps={{
+              min: 1,
+              style: { textAlign: "center" },
+            }}
           />
-          <FormHelperText>
-            <div align="center">Vote Required To Skip Song</div>
+          <FormHelperText sx={{ textAlign: "center" }}>
+            Vote Required To Skip Song
           </FormHelperText>
         </FormControl>
       </Grid>
