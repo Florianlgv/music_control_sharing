@@ -3,20 +3,27 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Grid, Button, Typography } from "@mui/material";
 import CreateUpdateRoomPage from "./CreateUpdateRoomPage";
 import WebPlayback from "./WebPlayback";
+import MusicPlayer from "./MusicPlayer";
 
 const Room = ({ leaveRoomCallback }) => {
   const { roomCode } = useParams();
   const [votesToSkip, setVotesToSkip] = useState(2);
+
   const [guestCanPause, setGuestCanPause] = useState(false);
   const [isHost, setIsHost] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [spotifyAuthenticated, setSpotifyAuthenticated] = useState(false);
-  const [token, setToken] = useState(null);
   const [song, setSong] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
     getRoomDetails();
+
+    const interval = setInterval(getCurrentSong, 1000);
+
+    return () => {
+      clearInterval(interval);
+    };
   }, [roomCode]);
 
   const getRoomDetails = () => {
@@ -34,7 +41,6 @@ const Room = ({ leaveRoomCallback }) => {
         setIsHost(data.is_host);
         if (data.is_host) {
           authenticateSpotify();
-          getAccessToken();
         }
         console.log(isHost, data.is_host);
       });
@@ -63,14 +69,6 @@ const Room = ({ leaveRoomCallback }) => {
       .catch((error) => {
         console.error("Error during fetch:", error);
       });
-  };
-
-  const getAccessToken = async () => {
-    const response = await fetch("/spotify/get-token");
-    const data = await response.json();
-    if (data.access_token) {
-      setToken(data.access_token);
-    }
   };
 
   const getCurrentSong = () => {
@@ -154,8 +152,8 @@ const Room = ({ leaveRoomCallback }) => {
           Room Code: {roomCode}
         </Typography>
       </Grid>
-      <Grid item xs={12} align="center">
-        <WebPlayback token={token} votesToSkip={votesToSkip} />
+      <Grid item xs={12} md={12} align="center" justifyContent="center">
+        <MusicPlayer {...song} votesToSkip={votesToSkip} />
       </Grid>
       {isHost ? renderSettingsButton() : null}
       <Grid item xs={12} align="center">

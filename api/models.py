@@ -21,3 +21,4 @@ class Room(models.Model):
     votes = models.IntegerField(null=False, default=0)
     votes_to_skip = models.IntegerField(null=False, default=1)
     created_at = models.DateTimeField(auto_now_add=True)
+    current_song = models.CharField(max_length=50, null=True)
