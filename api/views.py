@@ -6,6 +6,7 @@ from .utils import ensure_session
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import JsonResponse
+from django.views.decorators.http import require_POST
 
 
 class RoomView(generics.ListAPIView):
