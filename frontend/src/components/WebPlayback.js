@@ -6,15 +6,13 @@ import {
   Card,
   IconButton,
   LinearProgress,
-  CardContent,
-  CardMedia,
   Box,
-  useTheme,
 } from "@mui/material";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
 import SkipNextIcon from "@mui/icons-material/SkipNext";
 import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
+import NextPlanIcon from "@mui/icons-material/NextPlan";
 
 const track = {
   name: "",
@@ -31,6 +29,7 @@ function WebPlayback(props) {
   const [current_track, setTrack] = useState(track);
   const [is_connected, setConnected] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [hasVoted, setHasVoted] = useState(false);
 
   useEffect(() => {
     const script = document.createElement("script");
@@ -88,6 +87,24 @@ function WebPlayback(props) {
       };
     };
   }, [props.token]);
+
+  useEffect(() => {
+    setHasVoted(false); // Réinitialiser le vote lorsque la chanson change
+  }, [current_track]);
+
+  const handleSkipVote = () => {
+    if (!hasVoted) {
+      const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      };
+      fetch("/spotify/skip-vote", requestOptions);
+      setHasVoted(true); // Marquer que l'utilisateur a voté
+    } else {
+      console.log("Vous avez déjà voté pour passer cette chanson.");
+    }
+  };
+
   const deviceNotConnected = (
     <Card sx={{ bgcolor: "rgb(18, 18, 18)" }}>
       <Grid item xs={4} align="center" sx={{ py: 3 }}>
@@ -153,16 +170,29 @@ function WebPlayback(props) {
           </Card>
         </Grid>
         <Grid item xs={12} sm={12} md={4}>
-          <Card variant="outlined" sx={{ bgcolor: "rgb(40, 40, 40)", py: 4 }}>
+          <Card variant="outlined" sx={{ bgcolor: "rgb(40, 40, 40)", py: 2 }}>
             <Typography component="h5" variant="h5">
-              Want to skip "Counter"
+              Vote To Skip The Song
             </Typography>
+            <Typography component="h5" variant="h5">
+              0 / {props.votesToSkip}
+            </Typography>
+            <IconButton
+              style={{ color: "#fff" }}
+              sx={{ py: 2 }}
+              onClick={() => {
+                handleSkipVote();
+              }}
+              disabled={hasVoted}
+            >
+              <NextPlanIcon fontSize="large" />
+            </IconButton>
           </Card>
         </Grid>
       </Grid>
     </Card>
   );
-  return <>{is_active ? spotifyPlayer : deviceNotConnected}</>;
+  return <>{spotifyPlayer}</>;
 }
 
 export default WebPlayback;

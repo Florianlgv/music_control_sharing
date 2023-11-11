@@ -17,11 +17,6 @@ const Room = ({ leaveRoomCallback }) => {
 
   useEffect(() => {
     getRoomDetails();
-    // const interval = setInterval(getCurrentSong, 1000);
-
-    // return () => {
-    //   clearInterval(interval);
-    // };
   }, [roomCode]);
 
   const getRoomDetails = () => {
@@ -160,7 +155,7 @@ const Room = ({ leaveRoomCallback }) => {
         </Typography>
       </Grid>
       <Grid item xs={12} align="center">
-        {token && <WebPlayback token={token} {...song} />}
+        <WebPlayback token={token} votesToSkip={votesToSkip} />
       </Grid>
       {isHost ? renderSettingsButton() : null}
       <Grid item xs={12} align="center">

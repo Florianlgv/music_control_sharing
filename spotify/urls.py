@@ -7,4 +7,5 @@ urlpatterns = [
     path("is-authenticated", IsAuthenticated.as_view()),
     path("current-song", CurrentSong.as_view()),
     path("get-token", GetToken.as_view()),
+    path("skip-vote", SkipSongVote.as_view()),
 ]
