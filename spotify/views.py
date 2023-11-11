@@ -131,3 +131,26 @@ class GetToken(APIView):
         return Response(
             {"access_token": tokens.access_token}, status=status.HTTP_200_OK
         )
+
+
+def vote(request, room_id):
+    room = Room.objects.get(id=room_id)
+    return JsonResponse({"total_votes": room.votes})
+
+
+class SkipSongVote(APIView):
+    def post(self, request, format=None):
+        room_code = self.request.session.get("room_code")
+        room = Room.objects.filter(code=room_code)[0]
+        votes = room.votes
+        votes_needed = room.votes_to_skip
+
+        if self.request.session.session_key == room.host or votes + 1 >= votes_needed:
+            room.votes = 0
+            room.save()
+            skip_song(room.host)
+        else:
+            room.votes += 1
+            room.save()
+
+        return Response({}, status.HTTP_204_NO_CONTENT)

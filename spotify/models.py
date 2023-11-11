@@ -1,4 +1,5 @@
 from django.db import models
+from api.models import Room
 
 
 class SpotifyToken(models.Model):
