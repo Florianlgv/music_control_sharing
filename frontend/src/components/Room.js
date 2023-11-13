@@ -42,7 +42,6 @@ const Room = ({ leaveRoomCallback }) => {
         if (data.is_host) {
           authenticateSpotify();
         }
-        console.log(isHost, data.is_host);
       });
   };
 

@@ -159,11 +159,13 @@ const CreateRoomPage = (props) => {
           <TextField
             required={true}
             type="number"
+            variant="standard"
             onChange={handleVotesChange}
             defaultValue={votesToSkip}
             inputProps={{
               min: 1,
               style: { textAlign: "center" },
+              fontSize: "40px",
             }}
           />
           <FormHelperText sx={{ textAlign: "center" }}>
