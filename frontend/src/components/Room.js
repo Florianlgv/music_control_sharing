@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Grid, Button, Typography } from "@mui/material";
 import CreateUpdateRoomPage from "./CreateUpdateRoomPage";
-import WebPlayback from "./WebPlayback";
+
 import MusicPlayer from "./MusicPlayer";
 
 const Room = ({ leaveRoomCallback }) => {

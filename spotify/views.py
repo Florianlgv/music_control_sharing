@@ -175,6 +175,5 @@ class SkipSongVote(APIView):
 
 
 def check_user_vote(request):
-    # Vérifiez si l'utilisateur a déjà voté pour la chanson dans cette room
     vote_exists = Vote.objects.filter(user=request.session.session_key).exists()
     return JsonResponse({"hasVoted": vote_exists})
