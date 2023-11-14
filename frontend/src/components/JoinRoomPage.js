@@ -15,10 +15,9 @@ const JoinRoomPage = () => {
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        code: roomCode,
-      }),
+      body: JSON.stringify({ code: roomCode }),
     };
+
     fetch("/api/join-room", requestOptions)
       .then((response) => {
         if (response.ok) {

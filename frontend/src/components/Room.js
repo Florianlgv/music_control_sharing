@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Grid, Button, Typography } from "@mui/material";
-import CreateUpdateRoomPage from "./CreateUpdateRoomPage";
 
+import { Grid, Button, Typography } from "@mui/material";
+
+import CreateUpdateRoomPage from "./CreateUpdateRoomPage";
 import MusicPlayer from "./MusicPlayer";
 
 const Room = ({ leaveRoomCallback }) => {
   const { roomCode } = useParams();
-  const [votesToSkip, setVotesToSkip] = useState(2);
-
-  const [guestCanPause, setGuestCanPause] = useState(false);
-  const [isHost, setIsHost] = useState(false);
+  const [roomDetails, setRoomDetails] = useState({
+    votesToSkip: 2,
+    guestCanPause: false,
+    isHost: false,
+  });
   const [showSettings, setShowSettings] = useState(false);
-  const [spotifyAuthenticated, setSpotifyAuthenticated] = useState(false);
   const [song, setSong] = useState({});
   const navigate = useNavigate();
 
@@ -36,9 +37,11 @@ const Room = ({ leaveRoomCallback }) => {
         return response.json();
       })
       .then((data) => {
-        setVotesToSkip(data.votes_to_skip);
-        setGuestCanPause(data.guest_can_pause);
-        setIsHost(data.is_host);
+        setRoomDetails({
+          votesToSkip: data.votes_to_skip,
+          guestCanPause: data.guest_can_pause,
+          isHost: data.is_host,
+        });
         if (data.is_host) {
           authenticateSpotify();
         }
@@ -89,8 +92,8 @@ const Room = ({ leaveRoomCallback }) => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        votes_to_skip: votesToSkip,
-        guest_can_pause: guestCanPause,
+        votes_to_skip: roomDetails.votesToSkip,
+        guest_can_pause: roomDetails.guestCanPause,
       }),
     };
     fetch("/api/leave-room", requestOptions).then((response) => {
@@ -109,8 +112,8 @@ const Room = ({ leaveRoomCallback }) => {
         <Grid item xs={12} align="center">
           <CreateUpdateRoomPage
             update={true}
-            votesToSkip={votesToSkip}
-            guestCanPause={guestCanPause}
+            votesToSkip={roomDetails.votesToSkip}
+            guestCanPause={roomDetails.guestCanPause}
             roomCode={roomCode}
             updateCallback={getRoomDetails}
           ></CreateUpdateRoomPage>
@@ -152,9 +155,9 @@ const Room = ({ leaveRoomCallback }) => {
         </Typography>
       </Grid>
       <Grid item xs={12} md={12} align="center" justifyContent="center">
-        <MusicPlayer {...song} votesToSkip={votesToSkip} />
+        <MusicPlayer {...song} votesToSkip={roomDetails.votesToSkip} />
       </Grid>
-      {isHost ? renderSettingsButton() : null}
+      {roomDetails.isHost ? renderSettingsButton() : null}
       <Grid item xs={12} align="center">
         <Button
           variant="contained"

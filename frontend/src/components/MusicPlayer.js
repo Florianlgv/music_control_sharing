@@ -14,18 +14,27 @@ import SkipNextIcon from "@mui/icons-material/SkipNext";
 import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
 import NextPlanIcon from "@mui/icons-material/NextPlan";
 
-const MusicPlayer = (props) => {
+const MusicPlayer = ({
+  id,
+  image_url,
+  title,
+  artist,
+  is_playing,
+  time,
+  duration,
+  votes,
+  votesToSkip,
+}) => {
   const [hasVoted, setHasVoted] = useState(false);
 
   useEffect(() => {
     checkUserVote();
     setHasVoted(false);
-  }, [props.id]);
+  }, [id]);
 
   const checkUserVote = async () => {
     try {
       const response = await fetch(`/spotify/check-user-vote`);
-      // Assurez-vous de remplacer `userId` par l'identifiant actuel de l'utilisateur
       if (response.ok) {
         const data = await response.json();
         setHasVoted(data.hasVoted);
@@ -70,17 +79,17 @@ const MusicPlayer = (props) => {
       <Grid container spacing={2} alignItems="center" justifyContent="center">
         <Grid item xs={12} sm={6} md={4} align="center">
           <img
-            src={props.image_url}
+            src={image_url}
             className="now-playing__cover"
             height="100%"
             width="100%"
-            alt={props.title}
+            alt={title}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={8} align="center">
           <Card
             variant="outlined"
-            sx={{ bgcolor: "rgb(40, 40, 40)", py: { md: 3, sm: 0, xs: 0 } }}
+            sx={{ bgcolor: "rgb(40, 40, 40)", py: { md: 2, sm: 0, xs: 0 } }}
           >
             <Typography
               component="h4"
@@ -93,14 +102,14 @@ const MusicPlayer = (props) => {
                 },
               }}
             >
-              {props.title}
+              {title}
             </Typography>
             <Typography style={{ color: "#fff" }} variant="subtitle1">
-              {props.artist}
+              {artist}
             </Typography>
             <LinearProgress
               variant="determinate"
-              value={(100 * props.time) / props.duration}
+              value={(100 * time) / duration}
               sx={{
                 mt: { sm: 1, xs: 1 },
                 mx: { sm: 3, xs: 1 },
@@ -122,8 +131,8 @@ const MusicPlayer = (props) => {
                 },
                 display: "flex",
                 flexDirection: {
-                  xs: "column", // Empilement vertical sur les petits écrans
-                  sm: "row", // Alignement horizontal sur les écrans plus larges
+                  xs: "column",
+                  sm: "row",
                 },
                 alignItems: "center",
                 justifyContent: "center",
@@ -133,10 +142,10 @@ const MusicPlayer = (props) => {
                 size="large"
                 style={{ color: "#fff" }}
                 onClick={() => {
-                  props.is_playing ? pauseSong() : playSong();
+                  is_playing ? pauseSong() : playSong();
                 }}
               >
-                {props.is_playing ? <PauseIcon /> : <PlayArrowIcon />}
+                {is_playing ? <PauseIcon /> : <PlayArrowIcon />}
               </IconButton>
               {hasVoted ? (
                 <Card sx={{ bgcolor: "#008000", ml: { sm: 2, xs: 0 }, p: 1 }}>
@@ -162,7 +171,7 @@ const MusicPlayer = (props) => {
             </Box>
 
             <Typography style={{ color: "#fff" }} variant="subtitle1">
-              Skip Vote Counter : {props.votes}/{props.votesToSkip}
+              Skip Vote Counter : {votes}/{votesToSkip}
             </Typography>
           </Card>
         </Grid>

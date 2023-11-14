@@ -1,7 +1,4 @@
 import React, { useState, useEffect } from "react";
-import JoinRoomPage from "./JoinRoomPage";
-import CreateUpdateRoomPage from "./CreateUpdateRoomPage";
-import Room from "./Room";
 import {
   BrowserRouter as Router,
   Routes,
@@ -9,11 +6,12 @@ import {
   Link,
   Navigate,
 } from "react-router-dom";
+import JoinRoomPage from "./JoinRoomPage";
+import CreateUpdateRoomPage from "./CreateUpdateRoomPage";
+import Room from "./Room";
 import { Grid, Button, ButtonGroup, Typography } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
 
 const HomePage = () => {
-  const theme = useTheme();
   const [roomCode, setRoomCode] = useState(null);
 
   useEffect(() => {
@@ -32,12 +30,8 @@ const HomePage = () => {
   const homePage = (
     <Grid container spacing={3}>
       <Grid item xs={12} align="center">
-        <Typography variant="h3" compact="h3">
-          House Party
-        </Typography>
-        <Typography variant="h6" compact="h6">
-          By SpotiFlo
-        </Typography>
+        <Typography variant="h3">House Party</Typography>
+        <Typography variant="h6">By SpotiFlo</Typography>
       </Grid>
       <Grid item xs={12} align="center">
         <ButtonGroup disableElevation variant="contained" color="primary">
