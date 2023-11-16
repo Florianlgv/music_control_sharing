@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
-import { Grid, Button, Typography } from "@mui/material";
-
 import CreateUpdateRoomPage from "./CreateUpdateRoomPage";
 import MusicPlayer from "./MusicPlayer";
+import SearchSongPage from "./SearchSongPage";
+
+import { Grid, Button, Typography, Card } from "@mui/material";
 
 const Room = ({ leaveRoomCallback }) => {
   const { roomCode } = useParams();
@@ -14,6 +15,7 @@ const Room = ({ leaveRoomCallback }) => {
     isHost: false,
   });
   const [showSettings, setShowSettings] = useState(false);
+  const [showSearchSong, setShowSearchSong] = useState(false);
   const [song, setSong] = useState({});
   const navigate = useNavigate();
 
@@ -57,7 +59,6 @@ const Room = ({ leaveRoomCallback }) => {
         throw new Error("Network response was not ok.");
       })
       .then((data) => {
-        setSpotifyAuthenticated(data.status);
         if (!data.status) {
           fetch("/spotify/get-auth-url")
             .then((response) => {
@@ -91,15 +92,15 @@ const Room = ({ leaveRoomCallback }) => {
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        votes_to_skip: roomDetails.votesToSkip,
-        guest_can_pause: roomDetails.guestCanPause,
-      }),
     };
-    fetch("/api/leave-room", requestOptions).then((response) => {
+    fetch("/api/leave-room", requestOptions).then((_response) => {
       leaveRoomCallback();
       navigate("/");
     });
+  };
+
+  const updateShowSearchSong = (value) => {
+    setShowSearchSong(value);
   };
 
   const updateShowSettings = (value) => {
@@ -116,7 +117,7 @@ const Room = ({ leaveRoomCallback }) => {
             guestCanPause={roomDetails.guestCanPause}
             roomCode={roomCode}
             updateCallback={getRoomDetails}
-          ></CreateUpdateRoomPage>
+          />
         </Grid>
         <Grid item xs={12} align="center">
           <Button
@@ -144,18 +145,30 @@ const Room = ({ leaveRoomCallback }) => {
       </Grid>
     );
   };
+
   if (showSettings) {
     return renderSettings();
+  } else if (showSearchSong) {
+    return (
+      <SearchSongPage
+        updateShowSearchSong={updateShowSearchSong}
+        playlist_id={song.playlist_id}
+      />
+    );
   }
   return (
     <Grid container spacing={1}>
       <Grid item xs={12} align="center">
-        <Typography color="rgb(0,0,0)" variant="h4" component="h4">
+        <Typography color="rgb(0,0,0)" variant="h3" component="h3">
           Room Code: {roomCode}
         </Typography>
       </Grid>
       <Grid item xs={12} md={12} align="center" justifyContent="center">
-        <MusicPlayer {...song} votesToSkip={roomDetails.votesToSkip} />
+        <MusicPlayer
+          {...song}
+          votesToSkip={roomDetails.votesToSkip}
+          updateShowSearchSong={updateShowSearchSong}
+        />
       </Grid>
       {roomDetails.isHost ? renderSettingsButton() : null}
       <Grid item xs={12} align="center">

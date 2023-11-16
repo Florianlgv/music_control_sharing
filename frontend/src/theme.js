@@ -1,6 +1,6 @@
-import { createTheme } from "@mui/material/styles";
+import { createTheme, responsiveFontSizes } from "@mui/material/styles";
 
-const theme = createTheme({
+let theme = createTheme({
   palette: {
     // Utilisez une couleur primaire qui s'harmonise avec le bleu de votre dégradé
     primary: {
@@ -18,8 +18,20 @@ const theme = createTheme({
     // Configurez les autres éléments de couleur selon vos préférences
     // ...
   },
+  typography: {
+    h4: {
+      fontSize: "1.5rem", // Taille personnalisée pour h4
+      // Autres styles pour h4 si nécessaire...
+    },
+    h5: {
+      fontSize: "1.25rem",
+    },
+    h6: {
+      fontSize: "1rem",
+    },
+  },
   // Vous pouvez également personnaliser d'autres aspects du thème ici
   // ...
 });
-
+theme = responsiveFontSizes(theme);
 export default theme;
