@@ -86,7 +86,7 @@ def execute_spotify_api_request(
     try:
         return response.json()
     except ValueError:
-        return {"Error": "Issue with request"}
+        return {"Error": response}
 
 
 def play_song(session_id):
