@@ -96,12 +96,7 @@ class CurrentSong(APIView):
         album_cover = item.get("album").get("images")[0].get("url")
         is_playing = response.get("is_playing")
         song_id = item.get("id")
-        playlist_name, playlist_id = self.playlist_data(response, host)
-        playlist_name, playlist_id = self.playlist_data(response, host)
-        if playlist_name is None:
-            playlist_name = "No playlist"
-        if playlist_id is None:
-            playlist_id = "No playlist id"
+        playlist_id = self.playlist_id(response, host)
 
         artist_string = ""
         for i, artist in enumerate(item.get("artists")):
@@ -121,23 +116,24 @@ class CurrentSong(APIView):
             "votes": votes,
             "votes_required": room.votes_to_skip,
             "id": song_id,
-            "playlist_name": playlist_name,
             "playlist_id": playlist_id,
+            "playlist_name": room.current_playlist,
         }
 
-        self.update_room_song(room, song_id)
+        self.update_room_song(room, song_id, playlist_id)
 
         return Response(song, status=status.HTTP_200_OK)
 
-    def update_room_song(self, room, song_id):
+    def update_room_song(self, room, song_id, playlist_id):
         current_song = room.current_song
 
         if current_song != song_id:
             room.current_song = song_id
-            room.save(update_fields=["current_song"])
+            room.current_playlist = self.playlist_name(playlist_id, room.host)
+            room.save(update_fields=["current_song", "current_playlist"])
             votes = Vote.objects.filter(room=room).delete()
 
-    def playlist_data(self, response, host):
+    def playlist_id(self, response, host):
         playback_data = response
         if (
             "context" in playback_data
@@ -146,17 +142,15 @@ class CurrentSong(APIView):
         ):
             playlist_url = playback_data["context"]["external_urls"]["spotify"]
             playlist_id = playlist_url.split("/")[-1]
-            endpoint = f"playlists/{playlist_id}"
-            playlist_response = execute_spotify_api_request(host, endpoint)
-            if "Error" in playlist_response:
-                return (
-                    None,
-                    None,
-                )
+        return playlist_id
 
-            return playlist_response, playlist_id
+    def playlist_name(self, playlist_id, host):
+        endpoint = f"playlists/{playlist_id}"
+        playlist_name = execute_spotify_api_request(host, endpoint)
+        if "Error" in playlist_name:
+            return {"Error": "Api rate"}
 
-        return None, None
+        return playlist_name["name"]
 
 
 class PauseSong(APIView):

@@ -13,6 +13,7 @@ import {
   FormControlLabel,
   Collapse,
   Alert,
+  MenuItem,
 } from "@mui/material";
 
 const CreateRoomPage = ({
@@ -135,6 +136,42 @@ const CreateRoomPage = ({
           {title}
         </Typography>
       </Grid>
+      <Grid item xs={12} align="center">
+        <TextField
+          select
+          label="Select"
+          defaultValue="EUR"
+          helperText="Please select your currency"
+        >
+          {[
+            {
+              value: "USD",
+              label: "$",
+            },
+            {
+              value: "EUR",
+              label: "€",
+            },
+            {
+              value: "BTC",
+              label: "฿",
+            },
+            {
+              value: "JPY",
+              label: "¥", //rentrer les playlist dispos
+            },
+          ].map((option) => (
+            <MenuItem
+              sx={{ color: "#aaa" }}
+              key={option.value}
+              value={option.value}
+            >
+              {option.label}
+            </MenuItem>
+          ))}
+        </TextField>
+      </Grid>
+
       <Grid item xs={12} align="center">
         <FormControl component="fieldset">
           <FormHelperText align="center" sx={{ textAlign: "center" }}>
