@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import SearchBar from "./SearchBar";
 import {
   Grid,
   Typography,
@@ -11,8 +12,7 @@ import {
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
 import SkipNextIcon from "@mui/icons-material/SkipNext";
-import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
-import NextPlanIcon from "@mui/icons-material/NextPlan";
+import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 
 const MusicPlayer = ({
   id,
@@ -24,6 +24,8 @@ const MusicPlayer = ({
   duration,
   votes,
   votesToSkip,
+  updateShowSearchSong,
+  playlist_name,
 }) => {
   const [hasVoted, setHasVoted] = useState(false);
 
@@ -32,16 +34,19 @@ const MusicPlayer = ({
     setHasVoted(false);
   }, [id]);
 
-  const checkUserVote = async () => {
-    try {
-      const response = await fetch(`/spotify/check-user-vote`);
-      if (response.ok) {
-        const data = await response.json();
+  const checkUserVote = () => {
+    fetch(`/spotify/check-user-vote`)
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+      })
+      .then((data) => {
         setHasVoted(data.hasVoted);
-      }
-    } catch (error) {
-      console.error("Error checking user vote:", error);
-    }
+      })
+      .catch((error) => {
+        console.error("Error checking user vote:", error);
+      });
   };
 
   const pauseSong = () => {
@@ -67,12 +72,12 @@ const MusicPlayer = ({
     fetch("/spotify/skip-vote", requestOptions);
   };
 
-  const spotifyPlayer = (
+  return (
     <Card
       sx={{
         bgcolor: "rgb(18, 18, 18)",
         p: 2,
-        maxWidth: { xs: "100%", sm: "600px", lg: "800px" },
+        maxWidth: { xs: "80%", sm: "600px", lg: "800px" },
         margin: "auto",
       }}
     >
@@ -91,6 +96,9 @@ const MusicPlayer = ({
             variant="outlined"
             sx={{ bgcolor: "rgb(40, 40, 40)", py: { md: 2, sm: 0, xs: 0 } }}
           >
+            <Typography component="h6" variant="h6" sx={{ pb: 1 }}>
+              Playlist : {playlist_name}
+            </Typography>
             <Typography
               component="h4"
               variant="h4"
@@ -126,7 +134,7 @@ const MusicPlayer = ({
                   sm: 2,
                 },
                 mb: {
-                  xs: 1,
+                  xs: 0,
                   sm: 2,
                 },
                 display: "flex",
@@ -148,7 +156,10 @@ const MusicPlayer = ({
                 {is_playing ? <PauseIcon /> : <PlayArrowIcon />}
               </IconButton>
               {hasVoted ? (
-                <Card sx={{ bgcolor: "#008000", ml: { sm: 2, xs: 0 }, p: 1 }}>
+                <Card
+                  color="success"
+                  sx={{ bgcolor: "#008000", ml: { sm: 2, xs: 0 }, p: 1 }}
+                >
                   <Typography style={{ color: "#fff" }} variant="subtitle1">
                     Skip Vote Sent !
                   </Typography>
@@ -168,6 +179,13 @@ const MusicPlayer = ({
                   Vote to Skip
                 </Button>
               )}
+              <IconButton
+                size="large"
+                style={{ color: "#fff" }}
+                onClick={() => updateShowSearchSong(true)}
+              >
+                <PlaylistAddIcon />
+              </IconButton>
             </Box>
 
             <Typography style={{ color: "#fff" }} variant="subtitle1">
@@ -178,7 +196,6 @@ const MusicPlayer = ({
       </Grid>
     </Card>
   );
-  return spotifyPlayer;
 };
 
 export default MusicPlayer;

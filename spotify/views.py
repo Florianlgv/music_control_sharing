@@ -96,7 +96,13 @@ class CurrentSong(APIView):
         album_cover = item.get("album").get("images")[0].get("url")
         is_playing = response.get("is_playing")
         song_id = item.get("id")
-        playlist_name = self.playlist_name(response, host)
+        playlist_name, playlist_id = self.playlist_data(response, host)
+        playlist_name, playlist_id = self.playlist_data(response, host)
+        if playlist_name is None:
+            playlist_name = "No playlist"
+        if playlist_id is None:
+            playlist_id = "No playlist id"
+
         artist_string = ""
         for i, artist in enumerate(item.get("artists")):
             if i > 0:
@@ -116,6 +122,7 @@ class CurrentSong(APIView):
             "votes_required": room.votes_to_skip,
             "id": song_id,
             "playlist_name": playlist_name,
+            "playlist_id": playlist_id,
         }
 
         self.update_room_song(room, song_id)
@@ -130,9 +137,8 @@ class CurrentSong(APIView):
             room.save(update_fields=["current_song"])
             votes = Vote.objects.filter(room=room).delete()
 
-    def playlist_name(self, response, host):
+    def playlist_data(self, response, host):
         playback_data = response
-
         if (
             "context" in playback_data
             and playback_data["context"]
@@ -143,11 +149,14 @@ class CurrentSong(APIView):
             endpoint = f"playlists/{playlist_id}"
             playlist_response = execute_spotify_api_request(host, endpoint)
             if "Error" in playlist_response:
-                return playlist_response
+                return (
+                    None,
+                    None,
+                )
 
-            return playlist_response["name"]
+            return playlist_response, playlist_id
 
-        return "Not playing from a playlist"
+        return None, None
 
 
 class PauseSong(APIView):
@@ -217,3 +226,38 @@ class SearchSong(APIView):
             )
 
         return Response(spotify_tracks(room.host, search_input))
+
+
+class AddSongToPlaylist(APIView):
+    def post(self, request, format=None):
+        room_code = request.session.get("room_code")
+
+        song_id = request.data.get("song_id")
+        playlist_id = request.data.get("playlist_id")
+        print(song_id, playlist_id)
+        if not song_id or not playlist_id:
+            return Response(
+                {"message": "Missing song_id or playlist_id"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            room = Room.objects.get(code=room_code)
+            host = room.host
+
+            endpoint = f"playlists/{playlist_id}/tracks"
+            response = execute_spotify_api_request(
+                host, endpoint, post_=True, data={"uris": [f"spotify:track:{song_id}"]}
+            )
+
+            if "error" in response:
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+            return Response(
+                {"message": "Song added to playlist"}, status=status.HTTP_200_OK
+            )
+
+        except Room.DoesNotExist:
+            return Response(
+                {"message": "Room not found"}, status=status.HTTP_404_NOT_FOUND
+            )

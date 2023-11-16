@@ -30,3 +30,15 @@ html, body {
 .title-padding{
     padding: 10px;
 }
+
+.truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@media (max-width: 600px) {
+.center {
+    width: 80%;
+}
+}
