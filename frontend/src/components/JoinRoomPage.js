@@ -9,7 +9,7 @@ const JoinRoomPage = () => {
   const navigate = useNavigate();
 
   const handleTextFieldChange = (e) => {
-    setRoomCode(e.target.value);
+    setRoomCode(e.target.value.toUpperCase());
   };
 
   const handleRoomButtonPressed = () => {

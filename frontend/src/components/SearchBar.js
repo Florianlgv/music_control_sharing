@@ -22,10 +22,6 @@ export default function SearchBar({ playlist_id }) {
   }, [searchInput]);
 
   const search = () => {
-    if (searchInput == "") {
-      setTracks([]);
-      return;
-    }
     const url = `/spotify/search-song?query=${encodeURIComponent(searchInput)}`;
 
     fetch(url, {
