@@ -1,25 +1,28 @@
-from .models import SpotifyToken
-from django.utils import timezone
 from datetime import timedelta
-from .credentials import CLIENT_ID, CLIENT_SECRET
-from requests import post, put, get
+from requests import get, post, put
+from django.utils import timezone
 
+from .credentials import CLIENT_ID, CLIENT_SECRET
+from .models import SpotifyToken
 
 BASE_URL = "https://api.spotify.com/v1/"
 
 
 def get_user_tokens(session_id):
+    """
+    Retrieve Spotify tokens for a given session ID.
+    """
     user_tokens = SpotifyToken.objects.filter(user=session_id)
 
-    if user_tokens.exists():
-        return user_tokens[0]
-    else:
-        return None
+    return user_tokens.first()
 
 
 def update_or_create_user_tokens(
     session_id, access_token, token_type, expires_in, refresh_token
 ):
+    """
+    Update or create Spotify tokens for a user based on the session ID.
+    """
     expires_in = timezone.now() + timedelta(seconds=expires_in)
 
     SpotifyToken.objects.update_or_create(
@@ -34,25 +37,31 @@ def update_or_create_user_tokens(
 
 
 def is_spotify_authenticated(session_id):
+    """
+    Check if a Spotify session is authenticated based on the session ID.
+    """
     tokens = get_user_tokens(session_id)
     if tokens:
-        expiry = tokens.expires_in
-        if expiry <= timezone.now():
+        if tokens.expires_in <= timezone.now():
             refresh_spotify_token(session_id)
-
         return True
 
     return False
 
 
 def refresh_spotify_token(session_id):
-    refresh_token = get_user_tokens(session_id).refresh_token
+    """
+    Refresh the Spotify access token for the given session ID.
+    """
+    tokens = get_user_tokens(session_id)
+    if not tokens:
+        return
 
     response = post(
         "https://accounts.spotify.com/api/token",
         data={
             "grant_type": "refresh_token",
-            "refresh_token": refresh_token,
+            "refresh_token": tokens.refresh_token,
             "client_id": CLIENT_ID,
             "client_secret": CLIENT_SECRET,
         },
@@ -63,17 +72,23 @@ def refresh_spotify_token(session_id):
     expires_in = response.get("expires_in")
 
     update_or_create_user_tokens(
-        session_id, access_token, token_type, expires_in, refresh_token
+        session_id, access_token, token_type, expires_in, tokens.refresh_token
     )
 
 
 def execute_spotify_api_request(
     session_id, endpoint, post_=False, put_=False, data=None
 ):
+    """
+    Execute an API request to Spotify.
+    """
     tokens = get_user_tokens(session_id)
+    if not tokens:
+        return {"Error": "No tokens available"}
+
     headers = {
         "Content-Type": "application/json",
-        "Authorization": "Bearer " + tokens.access_token,
+        "Authorization": f"Bearer {tokens.access_token}",
     }
 
     url = BASE_URL + endpoint
@@ -83,10 +98,11 @@ def execute_spotify_api_request(
         response = put(url, headers=headers, json=data)
     else:
         response = get(url, headers=headers)
+
     try:
         return response.json()
     except ValueError:
-        return {"Error": response}
+        return {"Error": "Invalid response"}
 
 
 def play_song(session_id):
@@ -94,14 +110,21 @@ def play_song(session_id):
 
 
 def pause_song(session_id):
-    return execute_spotify_api_request(session_id, "me/player/pause", put_=True)
+    return execute_spotify_api_request(
+        session_id, "me/player/pause", put_=True
+    )
 
 
 def skip_song(session_id):
-    return execute_spotify_api_request(session_id, "me/player/next", post_=True)
+    return execute_spotify_api_request(
+        session_id, "me/player/next", post_=True
+    )
 
 
 def spotify_tracks(session_id, search_input):
+    """
+    Retrieve tracks from Spotify based on the search input.
+    """
     endpoint = f"search?q={search_input}&type=track&limit=8"
     spotify_data = execute_spotify_api_request(session_id, endpoint)
 
@@ -116,7 +139,7 @@ def spotify_tracks(session_id, search_input):
             "album": track["album"]["name"],
             "cover": track["album"]["images"][0]["url"],
         }
-        for track in spotify_data["tracks"]["items"]
+        for track in spotify_data.get("tracks", {}).get("items", [])
     ]
 
     return tracks
