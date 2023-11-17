@@ -7,9 +7,9 @@ export default function ResponsiveImage({ src, alt }) {
       alt={alt}
       style={{
         width: "auto",
-        height: "100%", // Ajusté pour occuper la hauteur complète
+        height: "100%",
         maxHeight: "50px",
-        objectFit: "cover", // Garantit que l'image couvre l'espace sans se déformer
+        objectFit: "cover",
       }}
     />
   );

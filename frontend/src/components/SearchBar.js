@@ -1,25 +1,13 @@
 import React, { useState, useEffect } from "react";
 
-import SpotifyTrackList from "./SpotifyTrackList";
-
-import {
-  Button,
-  Grid,
-  TextField,
-  Container,
-  InputAdornment,
-} from "@mui/material";
+import { TextField, InputAdornment } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+
+import SpotifyTrackList from "./SpotifyTrackList";
 
 export default function SearchBar({ playlist_id }) {
   const [searchInput, setSearchInput] = useState("");
   const [tracks, setTracks] = useState([]);
-
-  useEffect(() => {
-    if (searchInput) {
-      search();
-    }
-  }, [searchInput]);
 
   const search = () => {
     const url = `/spotify/search-song?query=${encodeURIComponent(searchInput)}`;
@@ -44,6 +32,12 @@ export default function SearchBar({ playlist_id }) {
         console.error("Error during search:", error);
       });
   };
+
+  useEffect(() => {
+    if (searchInput) {
+      search();
+    }
+  }, [searchInput]);
 
   return (
     <>

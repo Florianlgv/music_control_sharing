@@ -1,27 +1,15 @@
 import React, { useState } from "react";
-import {
-  Grid,
-  Avatar,
-  ListItemText,
-  Typography,
-  Card,
-  CardContent,
-  IconButton,
-  Stack,
-  Paper,
-} from "@mui/material";
+import { Grid, Typography, IconButton, Stack } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-
 import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 import Tooltip from "@mui/material/Tooltip";
+
 import ResponsiveImage from "./ResponsiveImage";
 
 export default function SpotifyTrackList({ tracks, playlist_id }) {
   const [addedSongs, setAddedSongs] = useState({});
 
   const toggleSongAdded = (id) => {
-    console.log("Song ID:", id, "Playlist ID:", playlist_id);
-
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -39,7 +27,6 @@ export default function SpotifyTrackList({ tracks, playlist_id }) {
         return response.json();
       })
       .then((data) => {
-        console.log("Song added:", data);
         setAddedSongs((prevAddedSongs) => ({
           ...prevAddedSongs,
           [id]: !prevAddedSongs[id],
