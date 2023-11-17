@@ -268,6 +268,15 @@ class AddSongToPlaylist(APIView):
 
         try:
             room = Room.objects.get(code=room_code)
+
+            current_playlist_tracks = playlist_tracks(room.host, playlist_id)
+            print(current_playlist_tracks)
+            if song_id in current_playlist_tracks:
+                return Response(
+                    {"message": "Song already in playlist"},
+                    status=status.HTTP_409_CONFLICT,
+                )
+
             endpoint = f"playlists/{playlist_id}/tracks"
             response = execute_spotify_api_request(
                 room.host,
@@ -288,3 +297,9 @@ class AddSongToPlaylist(APIView):
             return Response(
                 {"message": "Room not found"}, status=status.HTTP_404_NOT_FOUND
             )
+
+
+class CheckSongPlaylist(APIView):
+    def get(self, request, format=None):
+        endpoint = f"playlists/{playlist_id}/tracks"
+        response = api_re

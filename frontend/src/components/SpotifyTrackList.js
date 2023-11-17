@@ -22,6 +22,12 @@ export default function SpotifyTrackList({ tracks, playlist_id }) {
     fetch("/spotify/add-song-to-playlist", requestOptions)
       .then((response) => {
         if (!response.ok) {
+          if (response.status === 409) {
+            setAddedSongs((prevAddedSongs) => ({
+              ...prevAddedSongs,
+              [id]: { added: false, error: true },
+            }));
+          }
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         return response.json();
@@ -29,12 +35,18 @@ export default function SpotifyTrackList({ tracks, playlist_id }) {
       .then((data) => {
         setAddedSongs((prevAddedSongs) => ({
           ...prevAddedSongs,
-          [id]: !prevAddedSongs[id],
+          [id]: { added: true, error: false },
         }));
       })
       .catch((error) => {
         console.log("Error adding song:", error);
       });
+  };
+
+  const getBackgroundColor = (trackId) => {
+    const songState = addedSongs[trackId];
+    if (songState?.error) return "#d3d3d3";
+    return songState?.added ? "#96be73" : "transparent";
   };
 
   return (
@@ -46,7 +58,7 @@ export default function SpotifyTrackList({ tracks, playlist_id }) {
           alignItems="center"
           justifyContent="space-between"
           style={{
-            backgroundColor: addedSongs[track.id] ? "#96be73" : "transparent",
+            backgroundColor: getBackgroundColor(track.id),
           }}
         >
           <Grid item xs={2} sm={3} md={2} align="left" height="100%">

@@ -143,3 +143,15 @@ def spotify_tracks(session_id, search_input):
     ]
 
     return tracks
+
+
+def playlist_tracks(session_id, playlist_id):
+    """
+    Retrieve all track IDs from a specific playlist.
+    """
+    endpoint = f"playlists/{playlist_id}/tracks"
+    playlist_data = execute_spotify_api_request(session_id, endpoint)
+    playlist_tracks = [
+        item["track"]["id"] for item in playlist_data.get("items", [])
+    ]
+    return playlist_tracks
