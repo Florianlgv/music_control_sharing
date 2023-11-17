@@ -141,3 +141,4 @@ GitHub.sublime-settings
 
 */node_modules/
 **/credentials.py
+/spotify/credentials.py
