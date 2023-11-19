@@ -65,7 +65,7 @@ class JoinRoom(APIView):
         code = request.data.get(self.lookup_url_kwarg)
         if code is not None:
             room_query = Room.objects.filter(code=code)
-            if room_query.exist():
+            if room_query.exists():
                 self.request.session["room_code"] = code
                 return Response(
                     {"message": "Room Joined!"}, status=status.HTTP_200_OK
