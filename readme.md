@@ -1,6 +1,6 @@
-# PartyTunes
+# PartyMix
 
-PartyTunes est une application web conçue pour dynamiser vos soirées. Elle permet aux invités d'ajouter des morceaux à la playlist Spotify de l'hôte et de voter pour passer à la prochaine chanson, offrant une expérience musicale collaborative et interactive.
+PartyMix est une application web conçue pour dynamiser vos soirées. Elle permet aux invités d'ajouter des morceaux à la playlist Spotify de l'hôte et de voter pour passer à la prochaine chanson, offrant une expérience musicale collaborative et interactive.
 
 ## Fonctionnalités
 
@@ -10,7 +10,7 @@ PartyTunes est une application web conçue pour dynamiser vos soirées. Elle per
 
 ## Comment ça marche ?
 
-1. **Connexion de l'Hôte** : L'hôte se connecte à son compte Spotify et crée une session PartyTunes.
+1. **Connexion de l'Hôte** : L'hôte se connecte à son compte Spotify et crée une session PartyMix.
 2. **Rejoindre la Session** : Les invités rejoignent la session en utilisant un code unique fourni par l'hôte.
 3. **Interagir avec la Playlist** : Les invités ajoutent des morceaux et votent directement depuis leurs appareils.
 
