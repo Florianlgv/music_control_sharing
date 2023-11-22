@@ -22,4 +22,4 @@ PartyMix est une application web conçue pour dynamiser vos soirées. Elle perme
 
 ## Preview
 
-![Texte alternatif](img_github\ConnexionSpotify.PNG)
+![Texte alternatif](img_github/ConnexionSpotify.PNG)
