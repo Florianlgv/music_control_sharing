@@ -22,5 +22,11 @@ PartyMix est une application web conçue pour dynamiser vos soirées. Elle perme
 
 ## Preview
 
-![Texte alternatif](img_github/ConnexionSpotify.PNG)
-<img src="img_github/ConnexionSpotify.PNG" width="auto" height="100" alt="Texte alternatif">
+<img src="img_github/HomeScreen.PNG" width="auto" height="300" alt="Texte alternatif">
+<img src="img_github/JoinRoom.PNG" width="auto" height="300" alt="Texte alternatif">
+<img src="img_github/Create.PNG" width="auto" height="300" alt="Texte alternatif">
+<img src="img_github/ConnexionSpotify.PNG" width="auto" height="300" alt="Texte alternatif">
+<img src="img_github/RoomComputer.PNG" width="auto" height="300" alt="Texte alternatif">
+<img src="img_github/RoomMobile.PNG" width="auto" height="300" alt="Texte alternatif">
+<img src="img_github/RoomMobileVoted.PNG" width="auto" height="300" alt="Texte alternatif">
+<img src="img_github/MusicSearch.PNG" width="auto" height="300" alt="Texte alternatif">
