@@ -43,6 +43,8 @@ PartyMix est une application web conçue pour dynamiser vos soirées. Elle perme
     <td>
       <img src="img_github/RoomComputer.PNG" width="auto" height="250" alt="Texte alternatif">
     </td>
+</table>
+<table>
     <td>
       <img src="img_github/RoomMobile.PNG" width="auto" height="250" alt="Texte alternatif">
     </td>
