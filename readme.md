@@ -19,3 +19,7 @@ PartyMix est une application web conçue pour dynamiser vos soirées. Elle perme
 - **Frontend** : React.js
 - **Backend** : Django, Django REST Framework
 - **API** : Spotify Web API
+
+## Preview
+
+![Texte alternatif](img_github\ConnexionSpotify.PNG)
